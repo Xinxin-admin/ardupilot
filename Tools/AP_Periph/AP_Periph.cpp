@@ -80,6 +80,16 @@ void AP_Periph_FW::init()
 
     stm32_watchdog_pat();
 
+#if defined(HAL_PERIPH_NEOPIXEL_COUNT) || defined(HAL_PERIPH_ENABLE_RC_OUT)
+    hal.rcout->init();
+    stm32_watchdog_pat();
+#endif
+
+#ifdef HAL_PERIPH_NEOPIXEL_COUNT
+    hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN, HAL_PERIPH_NEOPIXEL_COUNT, AP_HAL::RCOutput::MODE_NEOPIXEL);
+    stm32_watchdog_pat();
+#endif
+
     can_start();
 
     serial_manager.init();
@@ -126,14 +136,6 @@ void AP_Periph_FW::init()
     battery.lib.init();
 #endif
 
-#if defined(HAL_PERIPH_NEOPIXEL_COUNT) || defined(HAL_PERIPH_ENABLE_RC_OUT)
-    hal.rcout->init();
-#endif
-
-#ifdef HAL_PERIPH_NEOPIXEL_COUNT
-    hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN, AP_HAL::RCOutput::MODE_NEOPIXEL);
-#endif
-
 #ifdef HAL_PERIPH_ENABLE_RC_OUT
     rcout_init();
 #endif
@@ -176,25 +178,15 @@ void AP_Periph_FW::init()
     start_ms = AP_HAL::native_millis();
 }
 
-#if defined(HAL_PERIPH_NEOPIXEL_COUNT) && HAL_PERIPH_NEOPIXEL_COUNT == 8
+#if defined(HAL_PERIPH_NEOPIXEL_COUNT)
 /*
   rotating rainbow pattern on startup
  */
-static void update_rainbow()
+void AP_Periph_FW::update_rainbow()
 {
-    static bool rainbow_done;
-    if (rainbow_done) {
-        return;
-    }
     uint32_t now = AP_HAL::native_millis();
-    if (now-start_ms > 1500) {
-        rainbow_done = true;
-        hal.rcout->set_serial_led_rgb_data(HAL_PERIPH_NEOPIXEL_CHAN, -1, 0, 0, 0);
-        hal.rcout->serial_led_send(HAL_PERIPH_NEOPIXEL_CHAN);
-        return;
-    }
     static uint32_t last_update_ms;
-    const uint8_t step_ms = 30;
+    const uint8_t step_ms = 50;
     if (now - last_update_ms < step_ms) {
         return;
     }
@@ -216,7 +208,7 @@ static void update_rainbow()
     static uint8_t step;
     const uint8_t nsteps = ARRAY_SIZE(rgb_rainbow);
     float brightness = 0.3;
-    for (uint8_t n=0; n<8; n++) {
+    for (uint8_t n=0; n<HAL_PERIPH_NEOPIXEL_COUNT; n++) {
         uint8_t i = (step + n) % nsteps;
         hal.rcout->set_serial_led_rgb_data(HAL_PERIPH_NEOPIXEL_CHAN, n,
                                          rgb_rainbow[i].red*brightness,
@@ -277,9 +269,6 @@ void AP_Periph_FW::update()
 #endif
         hal.scheduler->delay(1);
 #endif
-#ifdef HAL_PERIPH_NEOPIXEL_COUNT
-        hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN, HAL_PERIPH_NEOPIXEL_COUNT, AP_HAL::RCOutput::MODE_NEOPIXEL);
-#endif
 
 #ifdef HAL_PERIPH_LISTEN_FOR_SERIAL_UART_REBOOT_CMD_PORT
         check_for_serial_reboot_cmd(HAL_PERIPH_LISTEN_FOR_SERIAL_UART_REBOOT_CMD_PORT);
@@ -316,9 +305,7 @@ void AP_Periph_FW::update()
 
     can_update();
     hal.scheduler->delay(1);
-#if defined(HAL_PERIPH_NEOPIXEL_COUNT) && HAL_PERIPH_NEOPIXEL_COUNT == 8
-    update_rainbow();
-#endif
+
 #ifdef HAL_PERIPH_ENABLE_ADSB
     adsb_update();
 #endif

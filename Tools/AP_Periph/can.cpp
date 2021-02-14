@@ -1134,6 +1134,8 @@ static void can_wait_node_id(void)
 #endif
                 led_idx = (led_idx+1) % 32;
                 last_led_change = now;
+
+                periph.update_rainbow();
             }
         }
 

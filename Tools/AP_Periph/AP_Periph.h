@@ -36,6 +36,7 @@ public:
 
     Parameters g;
 
+    void update_rainbow();
     void can_start();
     void can_update();
     void can_mag_update();

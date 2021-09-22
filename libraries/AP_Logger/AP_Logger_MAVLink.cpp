@@ -24,7 +24,7 @@ extern const AP_HAL::HAL& hal;
 
 
 // initialisation
-void AP_Logger_MAVLink::Init()
+bool AP_Logger_MAVLink::Init()
 {
     _blocks = nullptr;
     while (_blockcount >= 8) { // 8 is a *magic* number
@@ -36,13 +36,15 @@ void AP_Logger_MAVLink::Init()
     }
 
     if (_blocks == nullptr) {
-        return;
+        return false;
     }
 
     free_all_blocks();
     stats_init();
 
     _initialised = true;
+
+    return true;
 }
 
 bool AP_Logger_MAVLink::logging_failed() const

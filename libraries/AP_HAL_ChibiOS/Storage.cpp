@@ -222,6 +222,8 @@ void Storage::_mark_dirty(uint16_t loc, uint16_t length)
     }
 }
 
+uint8_t Storage::FRAM_ID() { return fram.get_FRAM_ID(); }
+
 void Storage::read_block(void *dst, uint16_t loc, size_t n)
 {
     if ((n > sizeof(_buffer)) || (loc > (sizeof(_buffer) - n))) {

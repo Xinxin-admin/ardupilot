@@ -103,6 +103,8 @@ void Copter::init_ardupilot()
     gps.set_log_gps_bit(MASK_LOG_GPS);
     gps.init(serial_manager);
 
+    uart_autotest.init(serial_manager);
+
     AP::compass().set_log_bit(MASK_LOG_COMPASS);
     AP::compass().init();
 
@@ -173,6 +175,8 @@ void Copter::init_ardupilot()
     g2.smart_rtl.init();
 #endif
 
+    g2.adc_auto_test.init();
+    
     // initialise AP_Logger library
     logger.setVehicle_Startup_Writer(FUNCTOR_BIND(&copter, &Copter::Log_Write_Vehicle_Startup_Messages, void));
 

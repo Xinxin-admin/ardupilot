@@ -372,7 +372,6 @@ public:
         k_param_autotune_min_d, // remove
         k_param_arming, // 252  - AP_Arming
         k_param_logger = 253, // 253 - Logging Group
-
         // 254,255: reserved
 
         k_param_vehicle = 257, // vehicle common block of parameters
@@ -517,6 +516,8 @@ public:
     AP_Beacon beacon;
 #endif
 
+    AP_AdcAutoTest adc_auto_test;
+
 #if HAL_PROXIMITY_ENABLED
     // proximity (aka object avoidance) library
     AP_Proximity proximity;
@@ -610,6 +611,25 @@ public:
 
     // Failsafe options bitmask #36
     AP_Int32 fs_options;
+
+    AP_Int32 GYRO0_d_ID;
+    AP_Int32 GYRO1_d_ID;
+    AP_Int32 GYRO2_d_ID;
+
+    AP_Int32 ACC0_d_ID;
+    AP_Int32 ACC1_d_ID;
+    AP_Int32 ACC2_d_ID;
+
+    AP_Int32 compass_desired_ID1;
+    AP_Int32 compass_desired_ID2;
+    AP_Int32 compass_desired_ID3;
+    AP_Int32 compass_desired_ID4;
+
+    AP_Float ADC1_D_V;
+    AP_Float ADC2_D_V;
+    AP_Int8 FRAM_ID;
+
+    AP_Float BAT_D_mV;
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     // Autonmous autorotation

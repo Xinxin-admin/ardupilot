@@ -260,6 +260,8 @@ public:
     void Init(const struct LogStructure *structure, uint8_t num_types);
     void set_num_types(uint8_t num_types) { _num_types = num_types; }
 
+    bool check_SD() { return SD_ok; }
+
     bool CardInserted(void);
 
     // erase handling
@@ -588,6 +590,8 @@ private:
     void get_log_info(uint16_t log_num, uint32_t &size, uint32_t &time_utc);
 
     int16_t get_log_data(uint16_t log_num, uint16_t page, uint32_t offset, uint16_t len, uint8_t *data);
+
+    bool SD_ok = false;
 
     /* end support for retrieving logs via mavlink: */
 

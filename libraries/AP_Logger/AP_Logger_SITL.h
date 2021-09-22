@@ -14,7 +14,7 @@ class AP_Logger_SITL : public AP_Logger_Block {
 public:
     AP_Logger_SITL(AP_Logger &front, LoggerMessageWriter_DFLogStart *writer) :
         AP_Logger_Block(front, writer) {}
-    void        Init() override;
+    bool        Init() override;
     bool        CardInserted() const override;
     static constexpr const char *filename = "dataflash.bin";
 

@@ -133,6 +133,10 @@ AP_Logger::AP_Logger(const AP_Int32 &log_bitmask)
 
 void AP_Logger::Init(const struct LogStructure *structures, uint8_t num_types)
 {
+    SD_ok = false;
+
+    uint8_t SD_backend_num = 0;
+
     // convert from 8 bit to 16 bit LOG_FILE_BUFSIZE
     _params.file_bufsize.convert_parameter_width(AP_PARAM_INT8);
 
@@ -165,6 +169,7 @@ void AP_Logger::Init(const struct LogStructure *structures, uint8_t num_types)
             // note that message_writer is leaked here; costs several
             // hundred bytes to fix for marginal utility
         } else {
+            SD_backend_num = _next_backend;
             _next_backend++;
         }
     }
@@ -234,8 +239,12 @@ void AP_Logger::Init(const struct LogStructure *structures, uint8_t num_types)
     }
 #endif
 
+    bool init_ret = false;
     for (uint8_t i=0; i<_next_backend; i++) {
-        backends[i]->Init();
+        init_ret = backends[i]->Init();
+        if(i == SD_backend_num) {
+        SD_ok = init_ret;
+        }
     }
 
     start_io_thread();

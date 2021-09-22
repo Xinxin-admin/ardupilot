@@ -26,7 +26,7 @@ public:
                    const char *log_directory);
 
     // initialisation
-    void Init() override;
+    bool Init() override;
     bool CardInserted(void) const override;
 
     // erase handling

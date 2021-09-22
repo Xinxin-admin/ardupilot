@@ -64,7 +64,7 @@ void AP_Logger_File::ensure_log_directory_exists()
     }
 }
 
-void AP_Logger_File::Init()
+bool AP_Logger_File::Init()
 {
     // determine and limit file backend buffersize
     uint32_t bufsize = _front._params.file_bufsize;
@@ -82,7 +82,7 @@ void AP_Logger_File::Init()
 
     if (!_writebuf.get_size()) {
         hal.console->printf("Out of memory for logging\n");
-        return;
+        return false;
     }
 
     hal.console->printf("AP_Logger_File: buffer size=%u\n", (unsigned)bufsize);
@@ -94,7 +94,21 @@ void AP_Logger_File::Init()
         _log_directory = custom_dir;
     }
 
+    int ret;
+    struct stat st;
+    EXPECT_DELAY_MS(3000);
+    ret = AP::FS().stat(_log_directory, &st);
+    if (ret == -1) {
+        ret = AP::FS().mkdir(_log_directory);
+    }
+    if (ret == -1 && errno != EEXIST) {
+        printf("Failed to create log directory %s : %s\n", _log_directory, strerror(errno));
+        return false;
+    }
+
     Prep_MinSpace();
+
+    return true;
 }
 
 bool AP_Logger_File::file_exists(const char *filename) const

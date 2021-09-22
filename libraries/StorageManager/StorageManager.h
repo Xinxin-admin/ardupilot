@@ -64,6 +64,8 @@ public:
     // erase whole of storage
     static void erase(void);
 
+    static uint8_t get_fram_ID(void);
+
 private:
     struct StorageArea {
         StorageType type;

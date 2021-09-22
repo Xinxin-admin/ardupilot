@@ -13,7 +13,7 @@ class AP_Logger_DataFlash : public AP_Logger_Block {
 public:
     AP_Logger_DataFlash(AP_Logger &front, LoggerMessageWriter_DFLogStart *writer) :
         AP_Logger_Block(front, writer) {}
-    void              Init(void) override;
+    bool              Init(void) override;
     bool              CardInserted() const override { return !flash_died && df_NumPages > 0; }
 
 private:

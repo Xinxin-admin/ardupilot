@@ -99,6 +99,14 @@ public:
     bool register_gyro(uint8_t &instance, uint16_t raw_sample_rate_hz, uint32_t id);
     bool register_accel(uint8_t &instance, uint16_t raw_sample_rate_hz, uint32_t id);
 
+    int32_t get_gyro0_id() { return _gyro_id[0]; }
+    int32_t get_gyro1_id() { return _gyro_id[1]; }
+    int32_t get_gyro2_id() { return _gyro_id[2]; }
+
+    int32_t get_acc0_id() { return _accel_id[0]; }
+    int32_t get_acc1_id() { return _accel_id[1]; }
+    int32_t get_acc2_id() { return _accel_id[2]; }
+
     // a function called by the main thread at the main loop rate:
     void periodic();
 

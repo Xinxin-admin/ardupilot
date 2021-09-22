@@ -23,7 +23,7 @@
 #include "AP_Compass_Backend.h"
 
 #ifndef HAL_COMPASS_LIS3MDL_I2C_ADDR
-# define HAL_COMPASS_LIS3MDL_I2C_ADDR 0x1c
+# define HAL_COMPASS_LIS3MDL_I2C_ADDR 0x66
 #endif
 
 #ifndef HAL_COMPASS_LIS3MDL_I2C_ADDR2

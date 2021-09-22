@@ -43,7 +43,7 @@ public:
 
     virtual bool logging_started(void) const = 0;
 
-    virtual void Init() = 0;
+    virtual bool Init() { return false; }
 
     virtual uint32_t bufferspace_available() = 0;
 

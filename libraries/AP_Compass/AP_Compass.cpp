@@ -960,6 +960,33 @@ Compass::StateIndex Compass::_get_state_id(Compass::Priority priority) const
 #endif
 }
 
+bool Compass::check_dev_OK(int32_t desired_ID1, int32_t desired_ID2, int32_t desired_ID3,  int32_t desired_ID4)
+{
+    bool all_compass_ok = true;
+
+    if(desired_ID1 != _state._priv_instance[0].dev_id) {
+        gcs().send_text(MAV_SEVERITY_ALERT, "Mag1 error!");
+        all_compass_ok = false;
+    }
+
+    if(desired_ID2 != _state._priv_instance[1].dev_id) {
+        gcs().send_text(MAV_SEVERITY_ALERT, "Mag2 error!");
+        all_compass_ok = false;
+    }
+
+    if(desired_ID3 != _state._priv_instance[2].dev_id) {
+        gcs().send_text(MAV_SEVERITY_ALERT, "Mag3 error!");
+        all_compass_ok = false;
+    }
+
+    if(desired_ID4 != extra_dev_id[0]) {
+        gcs().send_text(MAV_SEVERITY_ALERT, "Mag4 error!");
+        all_compass_ok = false;
+    }
+
+    return all_compass_ok;
+}
+
 bool Compass::_add_backend(AP_Compass_Backend *backend)
 {
     if (!backend) {
@@ -1078,16 +1105,6 @@ void Compass::_probe_external_i2c_compasses(void)
 
 #if !defined(HAL_DISABLE_I2C_MAGS_BY_DEFAULT) || defined(HAL_USE_I2C_MAG_LIS3MDL)
     // lis3mdl on bus 0 with default address
-    FOREACH_I2C_INTERNAL(i) {
-        ADD_BACKEND(DRIVER_LIS3MDL, AP_Compass_LIS3MDL::probe(GET_I2C_DEVICE(i, HAL_COMPASS_LIS3MDL_I2C_ADDR),
-                    all_external, all_external?ROTATION_YAW_90:ROTATION_NONE));
-    }
-
-    // lis3mdl on bus 0 with alternate address
-    FOREACH_I2C_INTERNAL(i) {
-        ADD_BACKEND(DRIVER_LIS3MDL, AP_Compass_LIS3MDL::probe(GET_I2C_DEVICE(i, HAL_COMPASS_LIS3MDL_I2C_ADDR2),
-                    all_external, all_external?ROTATION_YAW_90:ROTATION_NONE));
-    }
 
     // external lis3mdl on bus 1 with default address
     FOREACH_I2C_EXTERNAL(i) {
@@ -1095,11 +1112,6 @@ void Compass::_probe_external_i2c_compasses(void)
                     true, ROTATION_YAW_90));
     }
 
-    // external lis3mdl on bus 1 with alternate address
-    FOREACH_I2C_EXTERNAL(i) {
-        ADD_BACKEND(DRIVER_LIS3MDL, AP_Compass_LIS3MDL::probe(GET_I2C_DEVICE(i, HAL_COMPASS_LIS3MDL_I2C_ADDR2),
-                    true, ROTATION_YAW_90));
-    }
 #endif
 
 #if !defined(HAL_DISABLE_I2C_MAGS_BY_DEFAULT) || defined(HAL_USE_I2C_MAG_AK09916)

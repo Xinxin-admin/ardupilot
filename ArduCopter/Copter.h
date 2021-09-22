@@ -68,6 +68,8 @@
 #include <AC_Sprayer/AC_Sprayer.h>          // Crop sprayer library
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
+#include <AP_UART_autotest/AP_UART_autotest.h>
+#include <AP_AdcAutoTest/AP_AdcAutoTest.h>
 
 // Configuration
 #include "defines.h"
@@ -525,6 +527,8 @@ private:
     AC_PrecLand precland;
 #endif
 
+    AP_UART_autotest uart_autotest;
+
     // Pilot Input Management Library
     // Only used for Helicopter for now
 #if FRAME_CONFIG == HELI_FRAME
@@ -767,6 +771,16 @@ private:
 #endif
     // inertia.cpp
     void read_inertia();
+
+    bool check_ins();
+    bool check_baro();
+    bool check_adc();
+    bool check_fram();
+    bool check_SD();
+    bool check_SBUS();
+    bool check_bat_volt();
+
+    void auto_check_all();
 
     // landing_detector.cpp
     void update_land_and_crash_detectors();

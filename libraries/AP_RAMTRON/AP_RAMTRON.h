@@ -22,6 +22,8 @@ public:
     // write to device
     bool write(uint32_t offset, uint8_t const * const buf, uint32_t size);
 
+    uint8_t get_FRAM_ID() { return id; };
+
 private:
     AP_HAL::OwnPtr<AP_HAL::SPIDevice> dev;
 

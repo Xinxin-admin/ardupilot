@@ -28,7 +28,7 @@ public:
         }
 
     // initialisation
-    void Init() override;
+    bool Init() override;
 
     // in actual fact, we throw away everything until a client connects.
     // This stops calls to start_new_log from the vehicles

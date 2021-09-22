@@ -221,6 +221,8 @@ constexpr int8_t Copter::_failsafe_priorities[7];
 // Main loop - 400hz
 void Copter::fast_loop()
 {
+    uart_autotest.update();
+
     // update INS immediately to get current gyro data populated
     ins.update();
 
@@ -545,6 +547,172 @@ void Copter::three_hz_loop()
     low_alt_avoidance();
 }
 
+bool Copter::check_baro()
+{
+    if(barometer.healthy() == false) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"Baro not healthy!");
+        return false;
+    }
+
+    float press = barometer.get_pressure();
+    if((press < 65000.0f) || (press > 102000.0f)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"Baro pressure error!");
+        return false;
+    }
+
+    float temp = barometer.get_temperature();
+    if((temp < 0) || (temp > 60.0f)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"Baro temp error!");
+        return false;
+    }
+
+    return true;
+}
+
+bool Copter::check_ins()
+{
+    bool result = true;
+
+    if((g2.GYRO0_d_ID != ins.get_gyro0_id()) && (g2.GYRO0_d_ID != 0)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"GYRO0 error!");
+        result = false;
+    }
+
+    if((g2.GYRO1_d_ID != ins.get_gyro1_id()) && (g2.GYRO1_d_ID != 0)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"GYRO1 error!");
+        result = false;
+    }
+
+    if((g2.GYRO2_d_ID != ins.get_gyro2_id()) && (g2.GYRO2_d_ID != 0)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"GYRO2 error!");
+        result = false;
+    }
+
+    if((g2.ACC0_d_ID != ins.get_acc0_id()) && (g2.ACC0_d_ID != 0)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"ACC0 error!");
+        result = false;
+    }
+
+    if((g2.ACC1_d_ID != ins.get_acc1_id()) && (g2.ACC1_d_ID != 0)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"ACC1 error!");
+        result = false;
+    }
+
+    if((g2.ACC2_d_ID != ins.get_acc2_id()) && (g2.ACC2_d_ID != 0)) {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"ACC2 error!");
+        result = false;
+    }
+
+    return result;
+}
+
+bool Copter::check_fram()
+{
+    if(StorageManager::get_fram_ID() != g2.FRAM_ID) {
+        gcs().send_text(MAV_SEVERITY_EMERGENCY, "FRAM ID ERROR %d", StorageManager::get_fram_ID());
+        return false;
+    }
+
+    return true;
+}
+
+bool Copter::check_SD()
+{
+    if(logger.check_SD() == false) {
+        gcs().send_text(MAV_SEVERITY_EMERGENCY, "SD Card error!");
+        return false;
+    }
+
+    return true;
+
+    
+}
+
+bool Copter::check_SBUS() 
+{
+    uint16_t rc_in = 0;
+    for (int i = 0; i < 14; i++) {
+        rc_in = RC_Channels::get_radio_in(i);
+        if(fabsf(rc_in - (1000.0f + i * 50.0f)) > 3.0f) {
+            gcs().send_text(MAV_SEVERITY_EMERGENCY, "SBUS error! Channel %d", i);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Copter::check_adc()
+{
+    float adc1_v = g2.adc_auto_test.read_ADC1();
+    float adc2_v = g2.adc_auto_test.read_ADC2();
+
+    bool adc1_OK = ((fabsf(adc1_v - g2.ADC1_D_V) < 0.1f) || (is_zero(g2.ADC1_D_V)));
+    bool adc2_OK = ((fabsf(adc2_v - g2.ADC2_D_V) < 0.1f) || (is_zero(g2.ADC2_D_V)));
+
+    gcs().send_text(MAV_SEVERITY_EMERGENCY, "  ");
+    gcs().send_text(MAV_SEVERITY_EMERGENCY, "  ");
+
+    if(adc1_OK == false) {
+        gcs().send_text(MAV_SEVERITY_EMERGENCY, "ADC1 error! %.2f V", adc1_v);
+    }
+
+    if(adc2_OK == false) {
+        gcs().send_text(MAV_SEVERITY_EMERGENCY, "ADC2 error! %.2f V", adc2_v);
+    }
+
+    return (adc1_OK && adc2_OK);
+}
+
+bool Copter::check_bat_volt()
+{
+    if(is_zero(g2.BAT_D_mV))
+        return true;
+
+    float bat_volt_mV = battery.voltage();
+    if (fabsf(bat_volt_mV - g2.BAT_D_mV) > 0.2f) {
+        gcs().send_text(MAV_SEVERITY_EMERGENCY, "BAT volt error! %.1f", bat_volt_mV);
+        return false;
+    }
+
+    return true;
+}
+
+void Copter::auto_check_all()
+{
+    bool all_is_ok = true;
+
+    // 测试ADC
+    bool ADC_OK = check_adc();
+
+    // 测试加速度计和陀螺仪
+    bool INS_OK = check_ins();
+
+    // 测试气压计
+    bool Baro_OK = check_baro();
+
+    // 测试磁罗盘
+    bool Compass_OK = compass.check_dev_OK(g2.compass_desired_ID1, g2.compass_desired_ID2, g2.compass_desired_ID3, g2.compass_desired_ID4);
+
+    // 测试FRAM
+    bool FRAM_OK = check_fram();
+
+    // 测试SD卡
+    bool SD_OK = check_SD();
+
+    // 测试SBUS
+    bool SBUS_OK = check_SBUS();
+
+    // 测试电池电压传感器
+    bool Bat_volt_OK = check_bat_volt();
+
+    all_is_ok = (ADC_OK && INS_OK && Baro_OK && Compass_OK && FRAM_OK && SD_OK && SBUS_OK && Bat_volt_OK);
+
+    if(all_is_ok) {
+        gcs().send_text(MAV_SEVERITY_EMERGENCY, "ALL OK!");
+    }
+}
+
 // one_hz_loop - runs at 1Hz
 void Copter::one_hz_loop()
 {
@@ -580,6 +748,9 @@ void Copter::one_hz_loop()
 #endif
 
     AP_Notify::flags.flying = !ap.land_complete;
+
+    // 硬件自动测试
+    auto_check_all();
 }
 
 void Copter::init_simple_bearing()

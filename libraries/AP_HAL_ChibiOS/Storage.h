@@ -47,6 +47,8 @@ public:
     void _timer_tick(void) override;
     bool healthy(void) override;
 
+    uint8_t FRAM_ID() override;
+
 private:
     enum class StorageBackend: uint8_t {
         None,

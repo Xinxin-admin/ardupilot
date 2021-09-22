@@ -30,7 +30,7 @@ AP_Logger_Block::AP_Logger_Block(AP_Logger &front, LoggerMessageWriter_DFLogStar
 }
 
 // init is called after backend init
-void AP_Logger_Block::Init(void)
+bool AP_Logger_Block::Init(void)
 {
     if (CardInserted()) {
         // reserve space for version in last sector
@@ -51,7 +51,7 @@ void AP_Logger_Block::Init(void)
 
         if (!writebuf.get_size()) {
             hal.console->printf("Out of memory for logging\n");
-            return;
+            return false;
         }
 
         hal.console->printf("AP_Logger_Block: buffer size=%u\n", (unsigned)bufsize);
@@ -65,6 +65,8 @@ void AP_Logger_Block::Init(void)
     } else {
         validate_log_structure();
     }
+
+    return true;
 }
 
 uint32_t AP_Logger_Block::bufferspace_available()

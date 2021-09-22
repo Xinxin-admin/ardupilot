@@ -54,19 +54,19 @@ extern const AP_HAL::HAL& hal;
 #define JEDEC_ID_WINBOND_W25Q256       0xEF4019
 #define JEDEC_ID_CYPRESS_S25FL128L     0x016018
 
-void AP_Logger_DataFlash::Init()
+bool AP_Logger_DataFlash::Init()
 {
     dev = hal.spi->get_device("dataflash");
     if (!dev) {
         AP_HAL::panic("PANIC: AP_Logger SPIDeviceDriver not found");
-        return;
+        return false;
     }
 
     dev_sem = dev->get_semaphore();
 
     if (!getSectorCount()) {
         flash_died = true;
-        return;
+        return false;
     }
 
     if (use_32bit_address) {
@@ -77,6 +77,7 @@ void AP_Logger_DataFlash::Init()
 
     AP_Logger_Block::Init();
 
+    return true;
     //flash_test();
 }
 

@@ -1069,6 +1069,29 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_GROUPINFO("GUID_TIMEOUT", 46, ParametersG2, guided_timeout, 3.0),
 #endif
 
+    AP_SUBGROUPINFO(adc_auto_test, "ADC_", 47, ParametersG2, AP_AdcAutoTest),
+
+    AP_GROUPINFO("GYRO0_D_ID", 48, ParametersG2, GYRO0_d_ID, 0),
+    AP_GROUPINFO("GYRO1_D_ID", 49, ParametersG2, GYRO1_d_ID, 0),
+    AP_GROUPINFO("GYRO2_D_ID", 50, ParametersG2, GYRO2_d_ID, 0),
+
+    AP_GROUPINFO("ACC0_D_ID", 51, ParametersG2, ACC0_d_ID, 0),
+    AP_GROUPINFO("ACC1_D_ID", 52, ParametersG2, ACC1_d_ID, 0),
+    AP_GROUPINFO("ACC2_D_ID", 53, ParametersG2, ACC2_d_ID, 0),
+
+    AP_GROUPINFO("MAG_D_ID1", 54, ParametersG2, compass_desired_ID1, 0),
+
+    AP_GROUPINFO("ADC1_D_V", 55, ParametersG2, ADC1_D_V, 0),
+    AP_GROUPINFO("ADC2_D_V", 56, ParametersG2, ADC2_D_V, 0),
+
+    AP_GROUPINFO("FRAM_D_ID", 57, ParametersG2, FRAM_ID, 0),
+
+    AP_GROUPINFO("BAT_D_MV", 58, ParametersG2, BAT_D_mV, 0),
+
+    AP_GROUPINFO("MAG_D_ID2", 59, ParametersG2, compass_desired_ID2, 0),
+    AP_GROUPINFO("MAG_D_ID3", 60, ParametersG2, compass_desired_ID3, 0),
+    AP_GROUPINFO("MAG_D_ID4", 61, ParametersG2, compass_desired_ID4, 0),
+
     AP_GROUPEND
 };
 

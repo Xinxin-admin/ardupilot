@@ -140,6 +140,11 @@ void StorageManager::erase(void)
     }
 }
 
+uint8_t StorageManager::get_fram_ID(void)
+{
+    return hal.storage->FRAM_ID();
+}
+
 /*
   constructor for StorageAccess
  */

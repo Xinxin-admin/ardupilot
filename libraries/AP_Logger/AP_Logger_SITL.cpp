@@ -25,7 +25,7 @@
 
 extern const AP_HAL::HAL& hal;
 
-void AP_Logger_SITL::Init()
+bool AP_Logger_SITL::Init()
 {
     if (flash_fd == 0) {
         flash_fd = open(filename, O_RDWR|O_CLOEXEC, 0777);
@@ -43,6 +43,8 @@ void AP_Logger_SITL::Init()
     df_NumPages = DF_NUM_PAGES;
 
     AP_Logger_Block::Init();
+
+    return true;
 }
 
 bool AP_Logger_SITL::CardInserted(void) const

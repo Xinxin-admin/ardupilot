@@ -102,6 +102,8 @@ public:
 
     bool enabled() const { return _enabled; }
 
+    bool check_dev_OK(int32_t desired_ID1, int32_t desired_ID2, int32_t desired_ID3, int32_t desired_ID4);
+
     /// Calculate the tilt-compensated heading_ variables.
     ///
     /// @param dcm_matrix			The current orientation rotation matrix

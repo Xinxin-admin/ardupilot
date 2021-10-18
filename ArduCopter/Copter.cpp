@@ -435,8 +435,8 @@ void Copter::three_hz_loop()
 void Copter::one_hz_loop()
 {
     //发送自定义消息
-    gcs().send_text(MAV_SEVERITY_CRITICAL,"Current altitude:%.1fm",copter.flightmode->get_alt_above_ground_cm()/100.0f);
-    
+    //gcs().send_text(MAV_SEVERITY_CRITICAL,"Current altitude:%.1fm",copter.flightmode->get_alt_above_ground_cm()/100.0f);
+    gcs().send_text(MAV_SEVERITY_CRITICAL,"pitch:%.1fm",pitch_test);
     if (should_log(MASK_LOG_ANY)) {
         Log_Write_Data(DATA_AP_STATE, ap.value);
     }
@@ -529,10 +529,12 @@ void Copter::update_simple_mode(void)
         // rotate roll, pitch input by -initial simple heading (i.e. north facing)
         rollx = channel_roll->get_control_in()*simple_cos_yaw - channel_pitch->get_control_in()*simple_sin_yaw;
         pitchx = channel_roll->get_control_in()*simple_sin_yaw + channel_pitch->get_control_in()*simple_cos_yaw;
+        pitch_test = pitchx;
     }else{
         // rotate roll, pitch input by -super simple heading (reverse of heading to home)
         rollx = channel_roll->get_control_in()*super_simple_cos_yaw - channel_pitch->get_control_in()*super_simple_sin_yaw;
         pitchx = channel_roll->get_control_in()*super_simple_sin_yaw + channel_pitch->get_control_in()*super_simple_cos_yaw;
+        pitch_test = pitchx;
     }
 
     // rotate roll, pitch input from north facing to vehicle's perspective

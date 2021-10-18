@@ -267,6 +267,8 @@ private:
     RC_Channel *channel_yaw;
 
     AP_Logger logger;
+    //定义全局变量---测试
+    extern float pitch_test;
 
     // flight modes convenience array
     AP_Int8 *flight_modes;

@@ -26,7 +26,7 @@ void Copter::arm_motors_check()
     }
 #endif
 
-    // ensure throttle is down
+    // ensure throttle is down ---确保油门值比较低
     if (channel_throttle->get_control_in() > 0) {
         arming_counter = 0;
         return;
@@ -34,15 +34,15 @@ void Copter::arm_motors_check()
 
     int16_t yaw_in = channel_yaw->get_control_in();
 
-    // full right
+    // full right --- 向右边打满---解锁
     if (yaw_in > 4000) {
 
-        // increase the arming counter to a maximum of 1 beyond the auto trim counter
+        // increase the arming counter to a maximum of 1 beyond the auto trim counter---增加arm的解锁计数
         if (arming_counter <= AUTO_TRIM_DELAY) {
             arming_counter++;
         }
 
-        // arm the motors and configure for flight
+        // arm the motors and configure for flight---开始做准备解锁工作，此时准备解锁电机，开始飞行配置
         if (arming_counter == ARM_DELAY && !motors->armed()) {
             // reset arming counter if arming fail
             if (!arming.arm(AP_Arming::Method::RUDDER)) {
@@ -50,14 +50,14 @@ void Copter::arm_motors_check()
             }
         }
 
-        // arm the motors and configure for flight
+        // arm the motors and configure for flight---解锁电机，开始飞行配置
         if (arming_counter == AUTO_TRIM_DELAY && motors->armed() && control_mode == Mode::Number::STABILIZE) {
             auto_trim_counter = 250;
             // ensure auto-disarm doesn't trigger immediately
             auto_disarm_begin = millis();
         }
 
-    // full left and rudder disarming is enabled
+    // full left and rudder disarming is enabled---关锁---全打到左边
     } else if ((yaw_in < -4000) && (arming_rudder == AP_Arming::RudderArming::ARMDISARM)) {
         if (!flightmode->has_manual_throttle() && !ap.land_complete) {
             arming_counter = 0;
@@ -69,12 +69,12 @@ void Copter::arm_motors_check()
             arming_counter++;
         }
 
-        // disarm the motors
+        // disarm the motors----上锁电机
         if (arming_counter == DISARM_DELAY && motors->armed()) {
             arming.disarm();
         }
 
-    // Yaw is centered so reset arming counter
+    // Yaw is centered so reset arming counter----如果偏航是在中间的话，我们不进行计数处理
     } else {
         arming_counter = 0;
     }

@@ -190,7 +190,6 @@
 #endif
 
 #include "mode.h"
-
 class Copter : public AP_Vehicle {
 public:
     friend class GCS_MAVLINK_Copter;
@@ -267,8 +266,6 @@ private:
     RC_Channel *channel_yaw;
 
     AP_Logger logger;
-    //定义全局变量---测试
-    extern float pitch_test;
 
     // flight modes convenience array
     AP_Int8 *flight_modes;
